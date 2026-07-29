@@ -1,0 +1,20 @@
+# Runtime dependencies for the AI pipeline.
+#
+# NOTE: these are intentionally left unpinned here because the exact versions
+# must come from the deploy/runtime environment (GPU torch builds, etc.).
+# Generate concrete pins with `pip freeze > requirements.lock.txt` from the
+# machine that actually runs the pipeline and commit that lock file.
+#
+# Test-only deps (pytest, ...) live in requirements-test.txt.
+
+praw
+python-dotenv
+scikit-learn
+transformers
+torch
+supabase
+langdetect
+accelerate
+huggingface-hub
+openai
+psycopg[binary]

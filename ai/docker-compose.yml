@@ -1,0 +1,23 @@
+services:
+  postgres:
+    # pgvector image (Postgres 16 base) so local Supabase mirror tables can use
+    # real `vector` columns. Must stay pg16 — the existing named volume was
+    # initialized with Postgres 16, and a major-version bump would not start
+    # against that data directory.
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_DB: problemfinder_local
+      POSTGRES_USER: problemfinder
+      POSTGRES_PASSWORD: problemfinder
+    ports:
+      - "5432:5432"
+    volumes:
+      - problemfinder_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U problemfinder -d problemfinder_local"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  problemfinder_postgres_data:

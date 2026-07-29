@@ -1,0 +1,447 @@
+@import "tailwindcss";
+
+/* ============================================================================
+   IMMENSITY DESIGN TOKENS
+   ----------------------------------------------------------------------------
+   Two token layers live here:
+
+   1. App/dashboard semantic tokens (--color-*). Components consume these by
+      meaning: blue for links/positive trends/health, green for confirmation,
+      amber for warnings, red for errors, and orange for brand emphasis.
+
+   2. Immensity brand tokens (--bg, --ink, --accent, …) — the premium marketing
+      system. Added additively at :root so shared chrome (nav/footer) can use
+      them everywhere. The `.marketing` scope (applied to the public layouts)
+      also remaps the legacy --color-* tokens to brand values, so any marketing
+      surface reads as one cohesive brand without affecting the dashboard.
+
+   Rule: components reference tokens via var(--token) / Tailwind `(--token)` —
+   never hardcoded hex.
+   ========================================================================== */
+
+:root {
+  /* ---- App / dashboard tokens ------------------------------------------- */
+  --color-bg:            #F6F3EE;
+  --color-surface:       #FFFCF7;
+  --color-surface-raised:#FFFFFF;
+  --color-surface-tint:  #F0ECE5;
+  /* Single source of truth for card backgrounds (matches the nav/sidebar tone).
+     Change this one value to restyle every card surface. */
+  --color-card:          #FFFCF7;
+  --color-text:          #1C1C1C;
+  --color-text-muted:    #68635C;
+  --color-text-faint:    #9C9489;
+  --color-accent:        #FF7008;
+  --color-accent-hover:  #E86100;
+  --color-accent-soft:   #FFF3E8;
+  --color-border:        #DED6CC;
+  --color-border-strong: #CFC4B8;
+  --color-error:         #F50F0F;
+  --color-error-soft:    #FFE8E8;
+  --color-error-text:    #B42318;
+  --color-success:       #50FFB1;
+  --color-success-soft:  #E7FFF4;
+  --color-success-text:  #14784B;
+  --color-blue:          #3E8EDE;
+  --color-blue-soft:     #EAF2FC;
+  --color-info-text:     #0E478E;
+  --color-link:          var(--color-blue);
+  --color-link-hover:    #2F75B9;
+  --color-button:        #1C1C1C;
+  --color-button-hover:  #000000;
+  --color-on-button:     #FFFFFF;
+  --color-warning:       #9A6700;
+  --color-warning-soft:  #FFF8C5;
+  --color-warning-text:  #7A5200;
+  --color-selected:      #1C1C1C;
+  --color-focus:         var(--color-selected);
+
+  /* ---- Filled chips (stronger than general-purpose soft surfaces) -------- */
+  --chip-neutral-bg:     #E2D8CC;
+  --chip-neutral-text:   #3A342E;
+  --chip-info-bg:        #C8DEF8;
+  --chip-info-text:      #0B437A;
+  --chip-success-bg:     #B2E8CC;
+  --chip-success-text:   #0D5535;
+  --chip-warning-bg:     #EBC969;
+  --chip-warning-text:   #664100;
+  --chip-danger-bg:      #F5B9B2;
+  --chip-danger-text:    #7D211A;
+
+  /* ---- Feature Categories ---- */
+  --color-feat-manage:   #5293BB;
+  --color-feat-build:    #3776A1;
+  --color-feat-monitor:  #1B5886;
+  --color-feat-market:   #003A6B;
+
+  /* ---- Immensity brand: surfaces (white + warm off-white) ---------------- */
+  /* Brand color system (single source of truth — JOB 2) */
+  --color-ink:           #1C1C1C;   /* primary text / headlines */
+  --color-ink-secondary: #2A2927;   /* strong secondary text */
+  --color-ink-muted:     #68635C;   /* secondary text */
+  --color-ink-faint:     #9C9489;   /* meta / captions */
+  --color-white:         #FFFFFF;
+  --color-off-white:     #F6F3EE;
+
+  --bg:            #F6F3EE;   /* primary canvas */
+  --bg-warm:       #F6F3EE;   /* warm off-white section background */
+  --surface:       #FFFCF7;   /* subtle card background */
+  --surface-2:     #F0ECE5;   /* nested / deeper surface */
+  --surface-ink:   #1C1C1C;   /* dark "object" surface for contrast moments */
+
+  /* ---- Brand: ink (near-black, never pure #000) -------------------------- */
+  --ink:           var(--color-ink);            /* body / headlines */
+  --ink-2:         var(--color-ink-secondary);  /* strong secondary */
+  --ink-muted:     var(--color-ink-muted);      /* secondary text */
+  --ink-faint:     var(--color-ink-faint);      /* meta / captions */
+  --on-dark:       #FFF7EF;   /* text on dark surfaces */
+  --on-dark-muted: #CFC4B8;
+
+  /* ---- Dashboard shell --------------------------------------------------- */
+  --shell-bg:        #F0ECE5;
+  --shell-text:      var(--color-text);
+  --shell-muted:     var(--color-text-muted);
+  --shell-border:    var(--color-border);
+  --shell-hover:     #E8E0D6;
+  --shell-active-bg: #E8E0D6;
+  --shell-subtle:    #ECE6DD;
+  --shell-control-bg: #E3D9CD;
+  --shell-highlight: var(--color-accent);
+
+  /* ---- Brand: accent ----------------------------------------------------- */
+  --accent:        #FF7008;
+  --accent-strong: #E86100;   /* hover / pressed */
+  --accent-soft:   #FFF3E8;   /* restrained orange tint */
+  --accent-line:   #F2B17A;   /* accent border */
+  --on-accent:     var(--color-white);
+
+  /* ---- Brand: borders ---------------------------------------------------- */
+  --border:        #DED6CC;
+  --border-strong: #CFC4B8;
+
+  /* ---- Data semantics (traffic-light scoring — from the product itself) -- */
+  --score-strong: var(--color-blue);   /* strong score / healthy signal */
+  --score-medium: #1C1C1C;   /* worth a look */
+  --score-weak:   #68635C;   /* weak */
+  --score-strong-soft: var(--color-blue-soft);
+  --score-medium-soft: #F0ECE5;
+
+  /* ---- Task status badges (theme-aware; see .dark overrides) -------------- */
+  --status-todo-bg:       #F0ECE5;
+  --status-todo-text:     #68635C;
+  --status-progress-bg:   #FFF3E8;
+  --status-progress-text: #A64200;
+  --status-done-bg:       #E7FFF4;
+  --status-done-text:     #14784B;
+
+  /* ---- Radii ------------------------------------------------------------- */
+  --radius-sm:  8px;
+  --radius:     12px;
+  --radius-lg:  18px;
+  --radius-xl:  26px;
+  --radius-2xl: 34px;
+
+  /* ---- Elevation (subtle — material presence, never heavy) --------------- */
+  --shadow-sm:   0 1px 2px rgba(28, 28, 28, 0.06);
+  --shadow:      0 10px 30px -22px rgba(28, 28, 28, 0.36);
+  --shadow-lift: 0 22px 60px -36px rgba(28, 28, 28, 0.42);
+}
+
+.dark {
+  --color-bg:            #141413;
+  --color-surface:       #1C1C1C;
+  --color-surface-raised:#242321;
+  --color-surface-tint:  #2D2A27;
+  --color-card:          #2D2A27;
+  --color-text:          #FFF7EF;
+  --color-text-muted:    #C8BFB4;
+  --color-text-faint:    #8F857A;
+  --color-accent:        #FF7008;
+  --color-accent-hover:  #FF8530;
+  --color-accent-soft:   #3B2412;
+  --color-border:        #393530;
+  --color-border-strong: #575049;
+  --color-error:         #F50F0F;
+  --color-error-soft:    #3A1717;
+  --color-error-text:    #FF8A8A;
+  --color-success:       #50FFB1;
+  --color-success-soft:  #123425;
+  --color-success-text:  #8DFFD0;
+  --color-blue:          #6CAEFF;
+  --color-blue-soft:     #102A46;
+  --color-info-text:     #8AC0FF;
+  --color-link:          var(--color-blue);
+  --color-link-hover:    #4C94E6;
+  --color-button:        #1C1C1C;
+  --color-button-hover:  #000000;
+  --color-on-button:     #FFFFFF;
+  --color-warning:       #E3B341;
+  --color-warning-soft:  #3A2D0A;
+  --color-warning-text:  #FFD666;
+  --color-selected:      #FFF7EF;
+  --color-focus:         var(--color-selected);
+
+  --chip-neutral-bg:     #2D2A27;
+  --chip-neutral-text:   #C8BFB4;
+  --chip-info-bg:        #102A46;
+  --chip-info-text:      #8AC0FF;
+  --chip-success-bg:     #123425;
+  --chip-success-text:   #8DFFD0;
+  --chip-warning-bg:     #3A2D0A;
+  --chip-warning-text:   #FFD666;
+  --chip-danger-bg:      #3A1717;
+  --chip-danger-text:    #FF8A8A;
+
+  --status-todo-bg:       #2D2A27;
+  --status-todo-text:     #C8BFB4;
+  --status-progress-bg:   #3B2412;
+  --status-progress-text: #FFC08A;
+  --status-done-bg:       #123425;
+  --status-done-text:     #8DFFD0;
+
+  --shell-bg:        var(--surface-ink);
+  --shell-text:      var(--on-dark);
+  --shell-muted:     var(--on-dark-muted);
+  --shell-border:    rgba(255, 255, 255, 0.1);
+  --shell-hover:     rgba(255, 255, 255, 0.06);
+  --shell-active-bg: rgba(255, 255, 255, 0.08);
+  --shell-subtle:    rgba(255, 255, 255, 0.06);
+  --shell-control-bg: rgba(255, 255, 255, 0.08);
+  --shell-highlight: var(--color-accent);
+}
+
+/* ----------------------------------------------------------------------------
+   Marketing scope: remap legacy --color-* to brand values so existing public
+   components inherit the brand. Applied on the public-facing layouts only.
+   -------------------------------------------------------------------------- */
+.marketing {
+  --color-bg:         var(--bg);
+  --color-surface:    var(--surface);
+  --color-text:       var(--ink);
+  --color-text-muted: var(--ink-muted);
+  --color-accent:     var(--accent);
+  --color-border:     var(--border);
+
+  background-color: var(--bg);
+  color: var(--ink);
+}
+
+@theme {
+  --font-sans: var(--font-main, ui-sans-serif, system-ui, sans-serif);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  /* UI / body / nav / buttons / dashboard all stay on the main font. */
+  font-family: var(--font-main), ui-sans-serif, system-ui, sans-serif;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: var(--color-accent-soft);
+  color: var(--color-text);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+input[type="checkbox"],
+input[type="radio"] {
+  accent-color: var(--color-success);
+}
+
+/* ----------------------------------------------------------------------------
+   Display typography (Fraunces) — marketing headlines only. Applied to every
+   marketing <h1>, plus an opt-in `.font-display` helper for hero headlines,
+   homepage section headlines, and the pricing headline. Body, nav, buttons and
+   the dashboard keep --font-main.
+   -------------------------------------------------------------------------- */
+.marketing h1,
+.font-display {
+  font-family: var(--font-display), ui-serif, Georgia, "Times New Roman", serif;
+}
+
+/* ----------------------------------------------------------------------------
+   Brand typography helpers
+   -------------------------------------------------------------------------- */
+.eyebrow {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+}
+
+.stat-label {
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+/* ----------------------------------------------------------------------------
+   Scroll reveal — subtle fade + slide-up only (respects reduced motion)
+   -------------------------------------------------------------------------- */
+.reveal {
+  opacity: 0;
+  transform: translateY(18px);
+  transition:
+    opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  transition-delay: var(--reveal-delay, 0ms);
+  will-change: opacity, transform;
+}
+
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
+/* Slow, calm drift for abstract hero data shapes */
+@keyframes brand-drift {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-10px); }
+}
+
+@keyframes brand-pulse {
+  0%, 100% { opacity: 0.45; }
+  50%      { opacity: 1; }
+}
+
+.brand-drift { animation: brand-drift 7s ease-in-out infinite; }
+.brand-pulse { animation: brand-pulse 4.5s ease-in-out infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .brand-drift,
+  .brand-pulse { animation: none; }
+}
+
+/* ----------------------------------------------------------------------------
+   Dashboard node-flow animation (used by authenticated "works" flow) — kept
+   -------------------------------------------------------------------------- */
+.node-flow-edge {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.36);
+  stroke-width: 0.35;
+  stroke-linecap: round;
+  stroke-dasharray: 1.4 2.1;
+  opacity: 0.9;
+  animation: node-flow-dash 3.8s linear infinite;
+}
+
+.node-flow-edge-blue {
+  stroke: rgba(41, 151, 255, 0.9);
+}
+
+.node-flow-edge-final {
+  stroke: rgba(142, 203, 255, 0.9);
+}
+
+.node-flow-card {
+  animation: node-flow-float 5.5s ease-in-out infinite;
+}
+
+.node-flow-core {
+  animation: node-flow-core 4s ease-in-out infinite;
+}
+
+@keyframes node-flow-dash {
+  from {
+    stroke-dashoffset: 0;
+  }
+  to {
+    stroke-dashoffset: -14;
+  }
+}
+
+@keyframes node-flow-float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes node-flow-core {
+  0%, 100% {
+    box-shadow: 0 30px 100px rgba(41, 151, 255, 0.22);
+  }
+  50% {
+    box-shadow: 0 30px 120px rgba(41, 151, 255, 0.4);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .node-flow-edge,
+  .node-flow-card,
+  .node-flow-core {
+    animation: none;
+  }
+}
+
+@media (max-width: 767px) {
+  .node-flow-card {
+    animation: none;
+  }
+}
+
+/* ----------------------------------------------------------------------------
+   Project timeline & calendar (launch-timeline feature) — motion + polish.
+   Token-driven so it reads correctly in both light and dark themes.
+   -------------------------------------------------------------------------- */
+@keyframes pf-pop-in {
+  from { opacity: 0; transform: translateY(10px) scale(0.975); }
+  to   { opacity: 1; transform: none; }
+}
+
+@keyframes pf-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes pf-sheen {
+  0%        { transform: translateX(-130%); }
+  60%, 100% { transform: translateX(360%); }
+}
+
+.pf-pop-in  { animation: pf-pop-in 0.26s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.pf-fade-in { animation: pf-fade-in 0.18s ease-out both; }
+
+/* Progress fill: smooth width tween + a slow travelling sheen for an alive feel. */
+.pf-bar-fill { transition: width 0.7s cubic-bezier(0.16, 1, 0.3, 1); }
+
+.pf-bar-sheen { position: relative; overflow: hidden; }
+.pf-bar-sheen::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  width: 30%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+  transform: translateX(-130%);
+  animation: pf-sheen 3.4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pf-pop-in, .pf-fade-in { animation: none; }
+  .pf-bar-fill { transition: none; }
+  .pf-bar-sheen::after { animation: none; display: none; }
+}
