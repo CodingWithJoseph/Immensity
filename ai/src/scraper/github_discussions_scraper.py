@@ -92,10 +92,21 @@ class GitHubDiscussionsScraper:
         return configured_repositories(overrides)
 
     def scrape(self, repositories: Iterable[str], *, limit_per_repository: int = 50, max_total: int | None = None) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+        targets = list(repositories)
+        if not self.client.token:
+            return [], {
+                "repositories_configured": len(targets),
+                "repositories_succeeded": 0,
+                "repositories_failed": 0,
+                "discussions_scraped": 0,
+                "authenticated": False,
+                "blocked_reason": "missing_github_token",
+                "failures": {},
+            }
+
         rows: list[dict[str, Any]] = []
         failures: dict[str, str] = {}
         succeeded = 0
-        targets = list(repositories)
         for repository in targets:
             if max_total is not None and len(rows) >= max_total:
                 break
@@ -111,7 +122,7 @@ class GitHubDiscussionsScraper:
             "repositories_succeeded": succeeded,
             "repositories_failed": len(failures),
             "discussions_scraped": len(rows),
-            "authenticated": bool(self.client.token),
+            "authenticated": True,
             "failures": failures,
         }
 
