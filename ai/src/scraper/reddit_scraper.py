@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import os
-from typing import Any
+from typing import Any, Iterable
 
 import praw
 from dotenv import load_dotenv
@@ -11,7 +11,7 @@ from dotenv import load_dotenv
 from problemfinder.persistence.local import connect_local
 from problemfinder.persistence.repositories.raw_posts import RawPostRepository
 from problemfinder.shared.reddit import normalize_reddit_row
-from util.constants import SUBREDDITS
+from problemfinder.sources import REDDIT_SOURCES, enabled_targets, source_group_for
 
 load_dotenv()
 
@@ -27,6 +27,8 @@ class RedditScraper:
         )
 
     def _get_dynamic_subreddits(self, limit: int = 50) -> list[str]:
+        if limit <= 0:
+            return []
         try:
             popular = [sub.display_name for sub in self.reddit.subreddits.popular(limit=limit)]
             defaults = [sub.display_name for sub in self.reddit.subreddits.default(limit=limit)]
@@ -35,8 +37,15 @@ class RedditScraper:
             print(f"Failed to fetch dynamic subreddits: {error}")
             return []
 
-    def get_subreddits(self, dynamic_limit: int = 50) -> list[str]:
-        return sorted(set(SUBREDDITS + self._get_dynamic_subreddits(dynamic_limit)))
+    def get_subreddits(
+        self,
+        dynamic_limit: int = 0,
+        overrides: Iterable[str] | None = None,
+    ) -> list[str]:
+        if overrides:
+            return list(dict.fromkeys(str(value).strip() for value in overrides if str(value).strip()))
+        static = [target.community for target in enabled_targets(REDDIT_SOURCES)]
+        return list(dict.fromkeys(static + self._get_dynamic_subreddits(dynamic_limit)))
 
     def _scrape_feed(
         self,
@@ -51,12 +60,14 @@ class RedditScraper:
                 if post.id in seen:
                     continue
                 seen.add(post.id)
+                community = subreddit.display_name
                 posts.append(
                     {
                         "id": post.id,
                         "title": post.title,
                         "body": post.selftext,
-                        "subreddit": subreddit.display_name,
+                        "subreddit": community,
+                        "source_group": source_group_for("reddit", community) or "discovered_unclassified",
                         "author": str(post.author) if post.author else "[deleted]",
                         "score": post.score,
                         "upvote_ratio": post.upvote_ratio,
@@ -72,17 +83,26 @@ class RedditScraper:
             print(f"Failed to scrape {feed} from r/{subreddit.display_name}: {error}")
         return posts
 
-    def scrape(self, subreddits: list[str], limit_per_feed: int = 100) -> list[dict[str, Any]]:
+    def scrape(
+        self,
+        subreddits: list[str],
+        limit_per_feed: int = 100,
+        feeds: Iterable[str] | None = None,
+        max_posts: int | None = None,
+    ) -> list[dict[str, Any]]:
         posts: list[dict[str, Any]] = []
         seen: set[str] = set()
+        selected_feeds = tuple(feeds or FEEDS)
         for handle in subreddits:
             try:
                 subreddit = self.reddit.subreddit(handle)
-                for feed in FEEDS:
+                for feed in selected_feeds:
                     posts.extend(self._scrape_feed(subreddit, feed, limit_per_feed, seen))
+                    if max_posts is not None and len(posts) >= max_posts:
+                        return posts[:max_posts]
             except Exception as error:
                 print(f"Failed to access r/{handle}: {error}")
-        return posts
+        return posts[:max_posts] if max_posts is not None else posts
 
     def save_to_db(self, posts: list[dict[str, Any]], connect_fn=connect_local) -> dict[str, Any]:
         if not posts:
