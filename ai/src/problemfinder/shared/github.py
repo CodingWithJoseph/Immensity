@@ -80,7 +80,7 @@ def normalize_github_issue(issue: dict[str, Any], repository: str) -> dict[str, 
         "source": "github",
         "source_type": "issue",
         "source_group": source_group,
-        "source_post_id": f"issue:{source_post_id}",
+        "source_post_id": source_post_id,
         "source_created_at": issue.get("created_at"),
         "title": title,
         "body": body,
@@ -90,7 +90,7 @@ def normalize_github_issue(issue: dict[str, Any], repository: str) -> dict[str, 
         "score": reactions.get("total_count"),
         "num_comments": _integer(issue.get("comments")),
         "payload": payload,
-        "content_hash": content_hash("github", f"issue:{source_post_id}", title, body),
+        "content_hash": content_hash("github", source_post_id, title, body),
     }
 
 
@@ -104,6 +104,7 @@ def normalize_github_discussion(discussion: dict[str, Any], repository: str) -> 
     category = discussion.get("category") if isinstance(discussion.get("category"), dict) else {}
     comments = discussion.get("comments") if isinstance(discussion.get("comments"), dict) else {}
     upvote_count = _integer(discussion.get("upvoteCount"))
+    discussion_identity = f"discussion:{source_post_id}"
     payload = {
         "source_type": "discussion",
         "source_group": source_group,
@@ -118,7 +119,7 @@ def normalize_github_discussion(discussion: dict[str, Any], repository: str) -> 
         "source": "github",
         "source_type": "discussion",
         "source_group": source_group,
-        "source_post_id": f"discussion:{source_post_id}",
+        "source_post_id": discussion_identity,
         "source_created_at": discussion.get("createdAt"),
         "title": title,
         "body": body,
@@ -128,5 +129,5 @@ def normalize_github_discussion(discussion: dict[str, Any], repository: str) -> 
         "score": upvote_count,
         "num_comments": _integer(comments.get("totalCount")),
         "payload": payload,
-        "content_hash": content_hash("github", f"discussion:{source_post_id}", title, body),
+        "content_hash": content_hash("github", discussion_identity, title, body),
     }
