@@ -1,0 +1,12 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "immensity",
+  "version": "1.0.0",
+  "description": "Discover software problems, analyze evidence, and create implementation-ready Build plans with Immensity.",
+  "author": {
+    "name": "Immensity",
+    "url": "https://useimmensity.com"
+  },
+  "homepage": "https://useimmensity.com",
+  "repository": "https://github.com/CodingWithJoseph/Immensity"
+}
