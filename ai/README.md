@@ -6,8 +6,10 @@ with the full cluster as evidence.
 
 ## Supported flow
 
-1. **Scrape** — collect GitHub issues and Reddit posts, then upsert both into
-   `cluster_items`.
+1. **Scrape** — collect Reddit posts, GitHub Issues/Discussions, Stack Exchange
+   questions, and Hacker News stories, then upsert them into `cluster_items`.
+   Static communities are assigned cross-platform `source_group` values so
+   related ecosystems can be compared downstream.
 2. **Clean** — remove duplicates, deleted/empty posts, bots, stickied/NSFW
    posts, non-English content, same-author near-duplicates, bodies outside
    50–5,000 characters, and structurally unreadable content.
@@ -42,13 +44,25 @@ python -m problemfinder.cli sync publish
 Every worker supports `--dry-run`, `--limit`, and `--max-minutes`. Streaming
 workers also support `--batch-size`.
 
-The scheduled `scrape` command runs GitHub first and Reddit second inside the
-existing Monday scrape window. Use `scrape --source github` or
-`scrape --source reddit` for a single source. GitHub defaults to a curated
-20-repository pilot, issues updated in the last 90 days, and at most 200 issues
-per repository. Pull requests are excluded. Set `GITHUB_REPOSITORIES` to a
-comma-separated owner/repository list, or repeat `--github-repository`, to
-replace the pilot targets. A `GITHUB_TOKEN` is optional but recommended.
+The default scrape uses a curated, high-signal source registry. Reddit dynamic
+community discovery is disabled by default so broad popular communities do not
+dilute the static set. GitHub Issues can use the public REST API without a
+token; GitHub Discussions require `GITHUB_TOKEN`. Stack Exchange works without
+an application key at the public quota, with optional `STACKEXCHANGE_KEY`.
+Hacker News uses its public Firebase API and requires no credentials.
+
+Sources can be run independently with `--source reddit`, `github-issues`,
+`github-discussions`, `stackexchange`, or `hackernews`; `--source github` runs
+both GitHub types. Each source has explicit target and total-item controls for
+small validation runs. Examples:
+
+```text
+python -m problemfinder.cli scrape --source reddit --reddit-subreddit SaaS --reddit-feed new --limit-per-feed 10 --reddit-max-posts 10
+python -m problemfinder.cli scrape --source github-issues --github-repository supabase/supabase --github-lookback-days 7 --github-max-items 10
+python -m problemfinder.cli scrape --source github-discussions --github-repository supabase/supabase --github-discussion-max-items 10
+python -m problemfinder.cli scrape --source stackexchange --stackexchange-site stackoverflow --stackexchange-lookback-days 7 --stackexchange-max-items 10
+python -m problemfinder.cli scrape --source hackernews --hackernews-feed askstories --hackernews-limit-per-feed 20 --hackernews-max-items 10
+```
 
 ## Human labeling
 
