@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "immensity": {
+      "type": "streamable-http",
+      "url": "https://mcp.useimmensity.com/mcp"
+    }
+  }
+}
