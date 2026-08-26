@@ -16,14 +16,16 @@ from typing import Any, Iterable
 # derived field is cleared and the row returns to ``scraped``.
 UPSERT_CLUSTER_ITEM = """
 INSERT INTO cluster_items (
-  platform, community, source_item_id, title, body, author, url,
-  score, num_comments, posted_at, raw_json, content_hash
+  platform, source_type, source_group, community, source_item_id, title, body,
+  author, url, score, num_comments, posted_at, raw_json, content_hash
 ) VALUES (
-  %(platform)s, %(community)s, %(source_item_id)s, %(title)s, %(body)s,
-  %(author)s, %(url)s, %(score)s, %(num_comments)s, %(posted_at)s,
-  %(raw_json)s::jsonb, %(content_hash)s
+  %(platform)s, %(source_type)s, %(source_group)s, %(community)s,
+  %(source_item_id)s, %(title)s, %(body)s, %(author)s, %(url)s, %(score)s,
+  %(num_comments)s, %(posted_at)s, %(raw_json)s::jsonb, %(content_hash)s
 )
 ON CONFLICT (platform, source_item_id) DO UPDATE SET
+  source_type = EXCLUDED.source_type,
+  source_group = EXCLUDED.source_group,
   community = EXCLUDED.community,
   title = EXCLUDED.title,
   body = EXCLUDED.body,
@@ -67,6 +69,8 @@ def _to_cluster_item(row: dict[str, Any]) -> dict[str, Any]:
     """Map a raw scrape row onto cluster_items ingest columns."""
     return {
         "platform": row.get("source"),
+        "source_type": row.get("source_type"),
+        "source_group": row.get("source_group"),
         "community": row.get("source_community_id") or row.get("subreddit"),
         "source_item_id": row.get("source_post_id"),
         "title": row.get("title"),
