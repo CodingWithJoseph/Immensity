@@ -1,0 +1,15 @@
+{
+  "name": "immensity",
+  "owner": {
+    "name": "Immensity"
+  },
+  "description": "Immensity integrations for AI coding agents.",
+  "plugins": [
+    {
+      "name": "immensity",
+      "source": "./plugins/immensity",
+      "description": "Discover software problems, analyze evidence, and create implementation-ready Build plans with Immensity.",
+      "version": "1.0.0"
+    }
+  ]
+}
