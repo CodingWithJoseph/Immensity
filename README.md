@@ -2,6 +2,45 @@
 
 Immensity is an opportunity-intelligence platform that turns unstructured public conversations into evidence-backed problem clusters. It combines a customer-facing web application, an asynchronous API, and a separate AI/ML data pipeline in one repository.
 
+## AI coding agent integrations
+
+Immensity exposes one production OAuth-enabled remote MCP endpoint for supported agents and IDEs:
+
+`https://mcp.useimmensity.com/mcp`
+
+The MCP workflow uses the connected client model for Analysis and Build reasoning, while Immensity provides the grounded project context, validates structured results, and persists the resulting Analysis and Build back to the user's Immensity project.
+
+This repository contains portable distribution metadata for Cursor and other Agent Plugins clients, Claude Code, JetBrains Junie, GitHub Copilot CLI, and Gemini CLI.
+
+### Claude Code
+
+```text
+/plugin marketplace add CodingWithJoseph/Immensity
+/plugin install immensity@immensity
+```
+
+### JetBrains Junie
+
+```text
+/extensions marketplace add CodingWithJoseph/Immensity
+/extensions install immensity
+```
+
+### GitHub Copilot CLI
+
+```bash
+copilot plugin marketplace add CodingWithJoseph/Immensity
+copilot plugin install immensity@immensity
+```
+
+### Gemini CLI
+
+```bash
+gemini extensions install https://github.com/CodingWithJoseph/Immensity
+```
+
+OAuth authentication is handled by the client when it connects to Immensity; no Immensity API key or manually copied bearer token is required.
+
 ## Repository layout
 
 | Directory | Purpose | Core technologies |
