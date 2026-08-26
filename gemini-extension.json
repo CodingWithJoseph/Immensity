@@ -1,0 +1,11 @@
+{
+  "name": "immensity",
+  "version": "1.0.0",
+  "description": "Discover software problems, analyze evidence, and create implementation-ready Build plans with Immensity.",
+  "mcpServers": {
+    "immensity": {
+      "httpUrl": "https://mcp.useimmensity.com/mcp",
+      "authProviderType": "dynamic_discovery"
+    }
+  }
+}
