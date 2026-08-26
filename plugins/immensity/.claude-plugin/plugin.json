@@ -1,0 +1,9 @@
+{
+  "name": "immensity",
+  "version": "1.0.0",
+  "description": "Discover software problems, analyze evidence, and create implementation-ready Build plans with Immensity.",
+  "author": {
+    "name": "Immensity"
+  },
+  "homepage": "https://useimmensity.com"
+}
